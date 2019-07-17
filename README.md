@@ -1,7 +1,7 @@
 # kaitai-struct-python-inspector
-Inspector for KaitaiStruct parsed objects.
+Tree builder for KaitaiStruct parsed objects.
 
-Represents KaitaiStruct persed objects (in Python) as trees. Provides API to traverse it.
+Represents KaitaiStruct parsed Python objects as trees. Provides API to traverse it.
 
 Shout out to [Kaitai team](https://github.com/kaitai-io) :)
 
