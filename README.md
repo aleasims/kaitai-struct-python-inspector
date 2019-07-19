@@ -14,18 +14,11 @@ Shout out to [Kaitai team](https://github.com/kaitai-io) :)
 pip install -r requirements.txt
 ```
 
-## Example usage
+## Guide
 ### CLI example
 TODO
 
 ### API example
-Compile with `ksc` any `.ksy` file:
-```
-ksc -t python --debug <your .ksy file>
-```
-
-* Target language: **Python**
-* `--debug` required!
 
 You can call `Inspector`:
 ```python
@@ -37,31 +30,43 @@ from inspector import Inspector
 insp = Inspector(ksy_file, test_file)
 ```
 
+Now you can traverse builded tree:
 
-Or you can directly invoke nodes creating:
+```python
+insp.tree.root.childs
+# [magic(ValueNode<bytes>) [0:8], chunks(ArrayNode) [8:100], ...]
+```
+
+Usefull methods and fields:
+
+* `name` — name of the node
+* `childs` — ordered set of child nodes
+* `parent` — parent node
+* `raw_value` — corresponding source buffer slice
+* `value` — interpreted value for `raw_value` *(exists only for ValueNodes!)*
+* `start`, `end` — absolute segment addresses in buffer
+
+
+If you want to compile `.ksy` files yourself, you can do it:
+```
+ksc -t python --debug <your .ksy file>
+```
+But remind:
+* Target language: **Python**
+* `--debug` flag is required
+
+Having `.ksy` compiled, you can invoke tree building:
 ```python
 test_file = 'path/to/binary/file'
 
-from parsetree import RootNode
-# Your compiled parser
+import parsetree
 from myformat import Myformat
 
-parser = Myformat.from_file(test_file)
-# Required to call `read` manually, because of `--debug`
-parser._read()
-
-with open(test_file, 'rb') as f:
-    buffer = f.read()
-
-tree = RootNode(buffer, parser)
+struct = Myformat.from_file(test_file)
+struct._read()
+tree = parsetree.build(struct)
 ```
-
-Now you can traverse builded tree!
-
-Usable methods and fileds:
-
-* `childs` — ordered set of childs of the node
-* `parent` — parent of the node
-* `raw_value` — corresponding buffer slice
-* `value` — interpreted value for `raw_value` *(exists only for ValueNodes!)*
-* `start`, `end` — absolute segment addresses in buffer
+or even shorter:
+```python
+tree = parsetree.parse_and_build(Myformat, test_file)
+```

@@ -19,12 +19,18 @@ def test_inspector():
     parsed = Png.from_file(test_file)
     parsed._read()
 
-    return RootNode(buf, parsed, verbose=True)
+    r = RootNode(buf, parsed, verbose=True)
+
+    from inspector import Inspector
+    i = Inspector('', '')
+
+    dot = i.tree_to_dot(r)
+    return r, i, dot
 
 
 def run_tests():
-    test_inspector()
+    return test_inspector()
 
 
 if __name__ == "__main__":
-    run_tests()
+    r, i, dot = run_tests()

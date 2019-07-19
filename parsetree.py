@@ -1,3 +1,14 @@
+"""Module responsible for building parse tree
+from KaitaiStruct object, obtained after parsing.
+
+Methods:
+    build(struct) — build tree for provided structure.
+    parse_and_build(ParserClass, buffer) — invokes parser for buffer
+                                           and build tree for result.
+"""
+
+
+import io
 from collections import namedtuple
 from enum import Enum
 
@@ -168,3 +179,26 @@ class RootNode(StructNode):
 
     def get_value(self, start, end):
         return self.buffer[start:end]
+
+
+def build(struct, verbose=False):
+    """Interface method, shorthand for RootNode()."""
+
+    _io = struct._io._io
+    if isinstance(_io, io.BytesIO):
+        buffer = _io.getbuffer().tobytes()
+    elif isinstance(_io, io.BufferedReader):
+        with open(struct._io._io.name, 'rb') as f:
+            buffer = f.read()
+    else:
+        raise TypeError('Unsupported stream type')
+
+    return RootNode(buffer, struct, verbose)
+
+
+def parse_and_build(ParserClass, path, verbose=False):
+    """Interface method, invokes parser for buffer."""
+
+    struct = ParserClass.from_file(path)
+    struct._read()
+    return build(struct, verbose)
