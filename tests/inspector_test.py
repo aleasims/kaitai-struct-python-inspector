@@ -19,7 +19,7 @@ def test_inspector():
     parsed = Png.from_file(test_file)
     parsed._read()
 
-    RootNode(buf, parsed)
+    return RootNode(buf, parsed, verbose=True)
 
 
 def run_tests():

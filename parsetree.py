@@ -1,18 +1,40 @@
-import kaitaistruct as ks
+from collections import namedtuple
 from enum import Enum
+
+import kaitaistruct as ks
+
+Segment = namedtuple('Segment', ['start', 'end'])
 
 
 class Node:
     """Represents one segment in parse."""
 
-    def __init__(self, name, start, end, root, parent, level=0):
+    PAD = '  '
+
+    def __init__(self, name, segment, offset, root, parent,
+                 level=0, verbose=False):
         self.name = name
-        self.start = start
-        self.end = end
+        self.segment = segment
+        self.offset = offset
         self.root = root
         self.parent = parent
         self.level = level
-        print('  ' * self.level + 'New node: {}'.format(self))
+        self.verbose = verbose
+
+        if self.verbose:
+            self.log('New node: {}'.format(self))
+
+    def log(self, msg):
+        padding = self.PAD * self.level
+        print(padding + msg)
+
+    @property
+    def start(self):
+        return self.offset + self.segment.start
+
+    @property
+    def end(self):
+        return self.offset + self.segment.end
 
     @property
     def raw_value(self):
@@ -57,19 +79,20 @@ class ExplorableNode(Node):
     def __init__(self, obj, *args, **kwargs):
         self.obj = obj
         super().__init__(*args, **kwargs)
-        print('  ' * self.level + 'Exploring node {}:'.format(self.name))
         self.childs = self._explore()
 
     def _explore(self):
         childs = []
         for index, obj in self._objects():
             name = self._child_name(index)
-            start, end = self._markers(index)
-            node = self._obj_to_node(obj, name, start, end, self.root, self)
+            segment = Segment(**self._markers(index))
+            offset = self._child_offset()
+            node = self._obj_to_node(obj, name, segment, offset,
+                                     self.root, self)
             childs.append(node)
         return childs
 
-    def _obj_to_node(self, obj, name, start, end, root, parent):
+    def _obj_to_node(self, obj, name, segment, offset, root, parent):
         if isinstance(obj, ks.KaitaiStruct):
             NodeClass = StructNode
         elif isinstance(obj, ValueNode.TYPES):
@@ -78,7 +101,9 @@ class ExplorableNode(Node):
             NodeClass = ArrayNode
         else:
             raise ValueError('Unknown object type: {}'.format(type(obj)))
-        return NodeClass(obj, name, start, end, root, parent, level=self.level + 1)
+
+        return NodeClass(obj, name, segment, offset, root, parent,
+                         level=self.level + 1, verbose=self.verbose)
 
     def _objects(self):
         raise NotImplementedError
@@ -87,6 +112,9 @@ class ExplorableNode(Node):
         raise NotImplementedError
 
     def _child_name(self, index):
+        raise NotImplementedError
+
+    def _child_offset(self):
         raise NotImplementedError
 
 
@@ -98,10 +126,19 @@ class StructNode(ExplorableNode):
             yield name, getattr(self.obj, name)
 
     def _markers(self, name):
-        return self.obj._debug[name]['start'], self.obj._debug[name]['end']
+        markers = self.obj._debug[name].copy()
+        if 'arr' in markers:
+            del markers['arr']
+        return markers
 
     def _child_name(self, name):
         return name
+
+    def _child_offset(self):
+        if isinstance(self.parent, StructNode):
+            if self.obj._io != self.parent.obj._io:
+                return self.start
+        return self.offset
 
 
 class ArrayNode(ExplorableNode):
@@ -111,19 +148,23 @@ class ArrayNode(ExplorableNode):
         return enumerate(self.obj)
 
     def _markers(self, index):
-        return self.parent.obj._debug[self.name]['arr'][index]['start'], \
-                self.parent.obj._debug[self.name]['arr'][index]['end']
+        return self.parent.obj._debug[self.name]['arr'][index]
 
     def _child_name(self, index):
         return self.name + '[{}]'.format(index)
 
+    def _child_offset(self):
+        return self.offset
+
 
 class RootNode(StructNode):
-    def __init__(self, buffer, obj):
+    def __init__(self, buffer, obj, verbose=False):
         self.buffer = buffer
         name = obj.__class__.__name__
-        start, end = 0, len(self.buffer)
-        super().__init__(obj, name, start, end, self, None)
+        segment = Segment(0, len(self.buffer))
+        offset = 0
+        super().__init__(obj, name, segment, offset,
+                         root=self, parent=None, verbose=verbose)
 
     def get_value(self, start, end):
         return self.buffer[start:end]
