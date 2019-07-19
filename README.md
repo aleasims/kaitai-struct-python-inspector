@@ -26,7 +26,7 @@ Usage:
 ```python
 test_file = 'path/to/binary/file'
 
-from parsertree import RootNode
+from parsetree import RootNode
 # Your compiled parser
 from myformat import Myformat
 
