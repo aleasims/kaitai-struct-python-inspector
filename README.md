@@ -44,8 +44,8 @@ Now you can traverse builded tree!
 
 Usable methods and fileds:
 
-* `childs`
-* `parent`
-* `raw_value`
-* `value` *(only for ValueNodes)*
-* `start`, `end` *(right now are broken for substreams cases)*
+* `childs` — ordered set of childs of the node
+* `parent` — parent of the node
+* `raw_value` — corresponding buffer slice
+* `value` — interpreted value for `raw_value` *(exists only for ValueNodes!)*
+* `start`, `end` — absolute segment addresses in buffer
