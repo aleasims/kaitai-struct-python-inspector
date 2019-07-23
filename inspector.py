@@ -5,7 +5,7 @@ from queue import Queue
 from graphviz import Digraph
 
 import parsetree
-import compiler
+import ksy
 
 TRAWL_TYPES = {
     'RootNode': 'ROOT',
@@ -35,7 +35,7 @@ class Inspector:
         self.ksy_path = ksy_path
         self.bin_path = bin_path
         self.verbose = verbose
-        self.ParserClass = compiler.compile_ksy(self.ksy_path)
+        self.ParserClass = ksy.compile(self.ksy_path, verbose=self.verbose)
         self.tree = parsetree.parse_and_build(self.ParserClass,
                                               self.bin_path,
                                               self.verbose)
@@ -58,6 +58,7 @@ class Inspector:
     @with_tree_only
     def to_trawl(self):
         def _to_trawl(node, **kwargs):
+            """Recursive callable."""
             json = kwargs.copy()
             childs = getattr(node, 'childs', [])
             if childs:

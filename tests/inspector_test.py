@@ -10,13 +10,13 @@ sys.path.insert(0, root_dir)
 def test_inspector():
     from inspector import Inspector
 
+    ksy_file = os.path.join(tests_dir, 'data/png.ksy')
     test_file = os.path.join(tests_dir, 'data/sample.png')
 
-    i = Inspector('', test_file)
+    Inspector(ksy_file, test_file, verbose=True)
 
     print('OK')
-    return i
 
 
 if __name__ == "__main__":
-    i = test_inspector()
+    test_inspector()
