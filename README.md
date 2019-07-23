@@ -7,13 +7,14 @@ Represents KaitaiStruct parsed Python objects as parse trees. Provides API to tr
 
 ![](https://i.imgur.com/RapSXSH.png)
 
+Analogue for [Kaitai Struct visualizer](https://github.com/kaitai-io/kaitai_struct_visualizer) 
+
 ## Requirements
 * **Python3.6**
 * `kaitai-struct-compiler` *(tested for `v0.9` from unstable repository)*
 
 And Python modules:
 * `kaitaistruct` (Python runtime module)
-* `pydotplus`
 * `graphviz`
 * `pyyaml`
 
