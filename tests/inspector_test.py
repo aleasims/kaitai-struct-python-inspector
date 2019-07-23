@@ -8,29 +8,15 @@ sys.path.insert(0, root_dir)
 
 
 def test_inspector():
-    from parsetree import RootNode
-    from data.png import Png
+    from inspector import Inspector
 
     test_file = os.path.join(tests_dir, 'data/sample.png')
 
-    with open(test_file, 'rb') as f:
-        buf = f.read()
+    i = Inspector('', test_file)
 
-    parsed = Png.from_file(test_file)
-    parsed._read()
-
-    r = RootNode(buf, parsed, verbose=True)
-
-    from inspector import Inspector
-    i = Inspector('', '')
-
-    dot = i.tree_to_dot(r)
-    return r, i, dot
-
-
-def run_tests():
-    return test_inspector()
+    print('OK')
+    return i
 
 
 if __name__ == "__main__":
-    r, i, dot = run_tests()
+    i = test_inspector()
