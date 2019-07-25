@@ -95,3 +95,9 @@ or even shorter:
 ```python
 tree = parsetree.parse_and_build(Myformat, test_file)
 ```
+
+
+## TODO
+
+- [ ] CLI interface
+- [ ] Use `--ksc-json-output` for compilation
