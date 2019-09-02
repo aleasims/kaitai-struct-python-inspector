@@ -51,10 +51,10 @@ class Node:
     def raw_value(self):
         """Sequence of bytes of this segment."""
         return self.root.get_value(self.start, self.end)
-    
+
     @property
     def size(self):
-        return self.end - self.start 
+        return self.end - self.start
 
     def __repr__(self):
         return '{name}({type}) [{start}:{end}]'.format(
