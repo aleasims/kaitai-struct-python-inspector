@@ -1,4 +1,9 @@
-# kaitai-struct-python-inspector
+# KaitaiStruct Python Inspector (kspyspector)
+
+[![Python 3.5](https://img.shields.io/badge/python-3.5-blue.svg)](https://www.python.org/downloads/release/python-350/)
+[![GitHub license](https://img.shields.io/github/license/aleasims/kaitai-struct-python-inspector)](https://github.com/aleasims/kaitai-struct-python-inspector/blob/master/LICENSE)
+
+
 [Kaitai Struct project](https://github.com/kaitai-io)
 
 This package contains tree builder for KaitaiStruct parsed objects.
@@ -10,31 +15,34 @@ Represents KaitaiStruct parsed Python objects as parse trees. Provides API to tr
 Analogue for [Kaitai Struct visualizer](https://github.com/kaitai-io/kaitai_struct_visualizer) 
 
 ## Requirements
-* **Python3.6**
-* `kaitai-struct-compiler` *(tested for `v0.9` from unstable repository)*
+* **Python3.5**
+* `kaitai-struct-compiler` ([install](http://kaitai.io/#download))
 
-And Python modules:
-* `kaitaistruct` (Python runtime module)
-* `graphviz`
-* `pyyaml`
-
-Installing using pip:
-```
-pip install -r requirements.txt
-```
-
-***Pay attention:*** runtime and compiler versions should match. Recommended to use current unstable version of compiler, so runtime should be installed from repository:
+***Pay attention:*** compiler and runtime library versions should match! If you install *unstable* version of compiler, you would probably need to install runtime library from source:
 ```
 git clone git@github.com:kaitai-io/kaitai_struct_python_runtime.git
 cd kaitai_struct_python_runtime
-python setup.py install
+pip install .
+```
+
+## Installation
+It's recommended to install everything into virtual environment.
+
+You can install package using pip:
+```
+cd kspyspector
+pip install .
 ```
 
 ## Guide
-### CLI example
-TODO
 
-### API example
+### CLI usage
+After installation you can call inspector from shell:
+```
+kspyspector --help
+```
+
+### API usage
 
 You can simply call `Inspector`:
 ```python
@@ -95,9 +103,3 @@ or even shorter:
 ```python
 tree = parsetree.parse_and_build(Myformat, test_file)
 ```
-
-
-## TODO
-
-- [ ] CLI interface
-- [ ] Use `--ksc-json-output` for compilation
