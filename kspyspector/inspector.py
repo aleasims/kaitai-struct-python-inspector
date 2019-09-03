@@ -6,8 +6,8 @@ from queue import Queue
 
 from graphviz import Digraph
 
-import ksy
-import parsetree
+from kspyspector import ksy
+from kspyspector import parsetree
 
 
 class NodeType(Enum):

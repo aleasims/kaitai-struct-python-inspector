@@ -1,9 +1,9 @@
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
@@ -16,22 +16,27 @@ setup(
     author='Evgin Alexander',
     classifiers=[
         'Development Status :: 3 - Alpha',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)'
     ],
     keywords='kaitaistruct parsetree',
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages=['kspyspector'],
+    package_dir={'kspyspector': 'kspyspector'},
     python_requires='>=3.5',
-    install_requires=['peppercorn'],  # Optional
+    install_requires=[
+        'kaitaistruct>=0.8',
+        'graphviz>=0.11.1',
+        'pyyaml>=5.1.1'
+    ],
     package_data={
-        'sample': ['package_data.dat'],
+        'kspyspector': ['tests/data/*'],
     },
     entry_points={
         'console_scripts': [
-            'sample=sample:main',
-        ],
+            'kspyspector=kspyspector.cli:main',
+        ]
     }
 )
