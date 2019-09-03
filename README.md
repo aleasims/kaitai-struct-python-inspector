@@ -39,7 +39,20 @@ pip install .
 ### CLI usage
 After installation you can call inspector from shell:
 ```
-kspyspector --help
+$ kspyspector --help
+usage: kspyspector [-h] [-o {dot,trawl}] [-f FILE] [-v] [-V] ksy_file bin_file
+
+positional arguments:
+  ksy_file              path to .ksy file
+  bin_file              path to binary file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o {dot,trawl}, --output {dot,trawl}
+                        serialize builded tree
+  -f FILE, --file FILE  output to file (stdout, if not set)
+  -v, --verbose
+  -V, --version         show program's version number and exit
 ```
 
 ### API usage
