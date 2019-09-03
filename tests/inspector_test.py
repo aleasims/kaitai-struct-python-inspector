@@ -8,7 +8,7 @@ sys.path.insert(0, root_dir)
 
 
 def test_inspector():
-    from inspector import Inspector
+    from kspyspector.inspector import Inspector
 
     ksy_file = os.path.join(tests_dir, 'data/png.ksy')
     test_file = os.path.join(tests_dir, 'data/sample.png')

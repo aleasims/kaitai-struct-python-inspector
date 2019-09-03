@@ -8,7 +8,7 @@ sys.path.insert(0, root_dir)
 
 
 def test_parsetree():
-    import parsetree
+    from kspyspector import parsetree
     from data.png import Png
     test_file = os.path.join(tests_dir, 'data/sample.png')
 
