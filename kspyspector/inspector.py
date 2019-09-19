@@ -34,13 +34,15 @@ def with_tree_only(func):
 
 
 class Inspector:
-    def __init__(self, ksy_path, bin_path, verbose=False):
+    def __init__(self, ksy_path, bin_path, ommit_empty=False, verbose=False):
         self.ksy_path = ksy_path
         self.bin_path = bin_path
         self.verbose = verbose
+        self.ommit_empty = ommit_empty
         self.ParserClass = ksy.compile(self.ksy_path, verbose=self.verbose)
         self.tree = parsetree.parse_and_build(self.ParserClass,
                                               self.bin_path,
+                                              self.ommit_empty,
                                               self.verbose)
 
     @with_tree_only

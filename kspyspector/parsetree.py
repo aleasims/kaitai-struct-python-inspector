@@ -23,7 +23,7 @@ class Node:
     PAD = '  '
 
     def __init__(self, name, segment, offset, root, parent,
-                 level=0, verbose=False):
+                 level=0, verbose=False, **kwargs):
         self.name = name
         self.segment = segment
         self.offset = offset
@@ -93,6 +93,7 @@ class ExplorableNode(Node):
 
     def __init__(self, obj, *args, **kwargs):
         self.obj = obj
+        self.ommit_empty = kwargs['ommit_empty']
         super().__init__(*args, **kwargs)
         self.childs = self._explore()
 
@@ -104,7 +105,8 @@ class ExplorableNode(Node):
             offset = self._child_offset()
             node = self._obj_to_node(obj, name, segment, offset,
                                      self.root, self)
-            childs.append(node)
+            if not self.ommit_empty or node.size > 0:
+                childs.append(node)
         return childs
 
     def _obj_to_node(self, obj, name, segment, offset, root, parent):
@@ -118,7 +120,8 @@ class ExplorableNode(Node):
             raise ValueError('Unknown object type: {}'.format(type(obj)))
 
         return NodeClass(obj, name, segment, offset, root, parent,
-                         level=self.level + 1, verbose=self.verbose)
+                         level=self.level + 1, ommit_empty=self.ommit_empty,
+                         verbose=self.verbose)
 
     def _objects(self):
         raise NotImplementedError
@@ -173,19 +176,20 @@ class ArrayNode(ExplorableNode):
 
 
 class RootNode(StructNode):
-    def __init__(self, buffer, obj, verbose=False):
+    def __init__(self, buffer, obj, ommit_empty=False, verbose=False):
         self.buffer = buffer
         name = obj.__class__.__name__
         segment = Segment(0, len(self.buffer))
         offset = 0
         super().__init__(obj, name, segment, offset,
-                         root=self, parent=None, verbose=verbose)
+                         root=self, parent=None,
+                         ommit_empty=ommit_empty, verbose=verbose)
 
     def get_value(self, start, end):
         return self.buffer[start:end]
 
 
-def build(struct, verbose=False):
+def build(struct, ommit_empty=False, verbose=False):
     """Interface method, shorthand for RootNode()."""
 
     _io = struct._io._io
@@ -197,12 +201,12 @@ def build(struct, verbose=False):
     else:
         raise TypeError('Unsupported stream type')
 
-    return RootNode(buffer, struct, verbose)
+    return RootNode(buffer, struct, ommit_empty, verbose)
 
 
-def parse_and_build(ParserClass, path, verbose=False):
+def parse_and_build(ParserClass, path, ommit_empty=False, verbose=False):
     """Interface method, invokes parser for buffer."""
 
     struct = ParserClass.from_file(path)
     struct._read()
-    return build(struct, verbose)
+    return build(struct, ommit_empty, verbose)

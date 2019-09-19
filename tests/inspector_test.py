@@ -13,7 +13,7 @@ def test_inspector():
     ksy_file = os.path.join(tests_dir, 'data/png.ksy')
     test_file = os.path.join(tests_dir, 'data/sample.png')
 
-    Inspector(ksy_file, test_file, verbose=True)
+    i = Inspector(ksy_file, test_file, ommit_empty=True, verbose=True)
 
     print('OK')
 
