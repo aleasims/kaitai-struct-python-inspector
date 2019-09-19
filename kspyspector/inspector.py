@@ -87,6 +87,7 @@ class Inspector:
                                                type=NodeType.RootNode.value),
                             'meta': {
                                 'generic': False,
+                                'complete_buffer': True,
                                 'buffer': base64.b64encode(self.tree.buffer).decode()
                             }
                           })
