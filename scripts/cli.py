@@ -7,17 +7,26 @@ from kspyspector.inspector import Inspector
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('ksy_file', type=str,
-                        help='path to .ksy file')
-    parser.add_argument('bin_file', type=str,
-                        help='path to binary file')
-    parser.add_argument('-o', '--output', type=str, choices=['dot', 'trawl'],
-                        help='serialize builded tree')
-    parser.add_argument('-f', '--file', type=str,
-                        help='output to file (stdout, if not set)')
-    parser.add_argument('-v', '--verbose', action='store_true')    
+    parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-V', '--version', action='version',
                         version='%(prog)s {}'.format(kspyspector.__version__))
+
+    input_params = parser.add_argument_group('input')
+    input_params.add_argument('ksy_file', type=str,
+                              help='path to .ksy file')
+    input_params.add_argument('bin_file', type=str,
+                              help='path to binary file')
+
+    build_params = parser.add_argument_group('build flags')
+    build_params.add_argument('-e', '--empty-ommit', action='store_true',
+                              help='do NOT include empty fields in result')
+
+    output_params = parser.add_argument_group('output')    
+    output_params.add_argument('-o', '--output', type=str,
+                               choices=['dot', 'trawl'],
+                               help='serialize builded tree')
+    output_params.add_argument('-f', '--file', type=str,
+                               help='output to file (to stdout, if not set)')
     return parser.parse_args()
 
 
