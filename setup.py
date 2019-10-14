@@ -40,7 +40,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'kspyspector=scripts.cli:main',
+            'kspyspector=scripts.main:main',
         ]
     }
 )
