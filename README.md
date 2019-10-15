@@ -22,15 +22,15 @@ Analogue for [Kaitai Struct visualizer](https://github.com/kaitai-io/kaitai_stru
   Use version from *unstable* branch (>=0.9), because it has bugs fixed! Install using `apt`:
   
   ```
-  $ sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv 379CE192D401AB61
-  $ echo "deb https://dl.bintray.com/kaitai-io/debian_unstable jessie main" | sudo tee /etc/apt/sources.list.d/kaitai.list
-  $ sudo apt-get update
-  $ sudo apt-get install kaitai-struct-compiler
+  sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv 379CE192D401AB61
+  echo "deb https://dl.bintray.com/kaitai-io/debian_unstable jessie main" | sudo tee /etc/apt/sources.list.d/kaitai.list
+  sudo apt-get update
+  sudo apt-get install kaitai-struct-compiler
   ```
   Ensure installation:
   ```
-  $ ksc --version
-  kaitai-struct-compiler 0.9-SNAPSHOT522603588
+  ksc --version
+  #kaitai-struct-compiler 0.9-SNAPSHOT522603588
   ```
 
 * Maybe you will need to install Java JDK. Easiest way using `apt`:
