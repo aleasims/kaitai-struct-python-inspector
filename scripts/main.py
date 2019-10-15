@@ -39,7 +39,6 @@ def parse_args():
 
 def main():
     args = parse_args()
-    print(dir(args))
 
     insp = Inspector(args.ksy_file, args.bin_file, args.empty_ommit,
                      args.verbose)

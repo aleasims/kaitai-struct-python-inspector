@@ -1,65 +1,87 @@
-import os
-import time
-import subprocess
-import yaml
 import importlib.util
 import inspect
+import json
+import os
 import shutil
+import subprocess
+import time
+
+import yaml
 
 
-class CompilationError(Exception):
+class KsyError(Exception):
     pass
 
 
-class create_tmp:
-    """Context manager for creating and cleaning tmp dir."""
+class TmpDir:
+    def __init__(self, path):
+        self.path = path
+
     def __enter__(self):
-        self.path = '/tmp/kaitai_{}'.format(int(time.time()))
-        os.mkdir(self.path)
+        os.makedirs(self.path, exist_ok=True)
         return self.path
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         shutil.rmtree(self.path)
 
 
-def get_class_name(path):
-    spec = yaml.load(open(path), Loader=yaml.FullLoader)
-    return spec['meta']['id']
+def create_tmp():
+    return TmpDir('/tmp/kaitai/{pid}_{time}'.format(
+        pid=os.getpid(), time=int(time.time())))
 
 
-def import_compiled(tmp, name):
-    name = name.lower()
-    filename = os.path.join(tmp, name + '.py')
-    spec = importlib.util.spec_from_file_location(name, filename)
+def import_module(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
 
-def find_parser_class(module, name):
+def compile_ksy(path, tmp, verbose=False):
+    cmd = ['ksc',
+           '--ksc-json-output',
+           '--debug',
+           '--target', 'python',
+           '--outdir', tmp,
+           path]
+    if verbose:
+        print(' '.join(cmd))
+
+    proc = subprocess.Popen(cmd,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    out, err = proc.communicate()
+    if err:
+        print('Something went wrong during compilation!')
+        raise KsyError(err.decode('utf-8'))
+    return out
+
+
+def parse_result(result, ksy_path, module_dir):
+    result = json.loads(result)[ksy_path]
+    target_lang = 'python'
+
+    module_name = result['firstSpecName']
+    module_spec = result['output'][target_lang][module_name]
+    module_filename = module_spec['files'].pop()['fileName']
+    module_path = os.path.join(module_dir, module_filename)
+
+    class_name = module_spec['topLevelName']
+
+    return module_name, module_path, class_name
+
+
+def get_class(module, name):
     for objname, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and objname.lower() == name:
+        if inspect.isclass(obj) and objname == name:
             return obj
     raise ImportError('Parser class not found in compiled code.')
 
 
 def compile(path, verbose=False):
     with create_tmp() as tmp:
-        cmd = 'ksc --debug --target python --outdir {output} {file}'.format(
-            file=path, output=tmp)
-        if verbose:
-            print(cmd)
-
-        proc = subprocess.Popen(cmd.split(),
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-        out, err = proc.communicate()
-        if out or err:
-            print('Something went wrong during compilation!')
-            raise CompilationError(out.decode('utf-8'))
-
-        name = get_class_name(path)
-        module = import_compiled(tmp, name)
-        Parser = find_parser_class(module, name)
-
+        result = compile_ksy(path, tmp, verbose)
+        module_name, module_path, class_name = parse_result(result, path, tmp)
+        module = import_module(module_name, module_path)
+        Parser = get_class(module, class_name)
     return Parser
