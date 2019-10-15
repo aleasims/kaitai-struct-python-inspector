@@ -1,8 +1,3 @@
-"""
-    Example usage:
-kspyspector tests/data/sample.ksy tests/data/sample.bin
-"""
-
 import argparse
 import sys
 
@@ -10,8 +5,15 @@ import kspyspector
 from kspyspector.inspector import Inspector
 
 
+example_usage = '''example:
+    kspyspector tests/data/sample.ksy tests/data/sample.bin
+'''
+
+
 def parse_args():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=example_usage)
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-V', '--version', action='version',
                         version='%(prog)s {}'.format(kspyspector.__version__))
@@ -23,7 +25,7 @@ def parse_args():
                               help='path to binary file')
 
     build_params = parser.add_argument_group('build flags')
-    build_params.add_argument('-e', '--empty_ommit', action='store_true',
+    build_params.add_argument('-e', '--empty-ommit', action='store_true',
                               help='do NOT include empty fields in result')
 
     output_params = parser.add_argument_group('output')
@@ -37,6 +39,7 @@ def parse_args():
 
 def main():
     args = parse_args()
+    print(dir(args))
 
     insp = Inspector(args.ksy_file, args.bin_file, args.empty_ommit,
                      args.verbose)

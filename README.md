@@ -15,23 +15,60 @@ Represents KaitaiStruct parsed Python objects as parse trees. Provides API to tr
 Analogue for [Kaitai Struct visualizer](https://github.com/kaitai-io/kaitai_struct_visualizer) 
 
 ## Requirements
-* **Python3.5**
-* `kaitai-struct-compiler` ([install](http://kaitai.io/#download))
+* Python **>=3.5**
 
-***Pay attention:*** compiler and runtime library versions should match! If you install *unstable* version of compiler, you would probably need to install runtime library from source:
-```
-git clone git@github.com:kaitai-io/kaitai_struct_python_runtime.git
-cd kaitai_struct_python_runtime
-pip install .
-```
+* KaitaiStruct Compiler **>=0.9**
+
+  Use version from *unstable* branch (>=0.9), because it has bugs fixed! Install using `apt`:
+  
+  ```
+  $ sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv 379CE192D401AB61
+  $ echo "deb https://dl.bintray.com/kaitai-io/debian_unstable jessie main" | sudo tee /etc/apt/sources.list.d/kaitai.list
+  $ sudo apt-get update
+  $ sudo apt-get install kaitai-struct-compiler
+  ```
+  Ensure installation:
+  ```
+  $ ksc --version
+  kaitai-struct-compiler 0.9-SNAPSHOT522603588
+  ```
+
+* Maybe you will need to install Java JDK. Easiest way using `apt`:
+
+  ```
+  sudo apt install openjdk-11-jdk
+  ```
+
+* Python virtual environment is recommended
+  ```
+  python3 -m venv env
+  source env/bin/activate
+  ```
+
+* KaitaiStruct Python Runtime
+
+  Compiler and runtime library versions should match! You`ve installed compiler from unstable branch and PyPi usually provides a stable version of runtime module. So it's better to install from source:
+  ```
+  git clone git@github.com:kaitai-io/kaitai_struct_python_runtime.git
+  cd kaitai_struct_python_runtime
+  pip install .
+  ```
 
 ## Installation
-It's recommended to install everything into virtual environment.
-
-You can install package using pip:
+Package itself can be installed using pip:
 ```
 cd kspyspector
 pip install .
+```
+
+Test that everything is done right:
+```
+kspyspector tests/data/sample.ksy tests/data/sample.bin
+```
+
+Installing in developers mode:
+```
+pip install -e .[dev]
 ```
 
 ## Guide
@@ -40,19 +77,28 @@ pip install .
 After installation you can call inspector from shell:
 ```
 $ kspyspector --help
-usage: kspyspector [-h] [-o {dot,trawl}] [-f FILE] [-v] [-V] ksy_file bin_file
-
-positional arguments:
-  ksy_file              path to .ksy file
-  bin_file              path to binary file
+usage: kspyspector [-h] [-v] [-V] [-e] [-o {dot,trawl}] [-f FILE]
+                   ksy_file bin_file
 
 optional arguments:
   -h, --help            show this help message and exit
-  -o {dot,trawl}, --output {dot,trawl}
-                        serialize builded tree
-  -f FILE, --file FILE  output to file (stdout, if not set)
   -v, --verbose
   -V, --version         show program's version number and exit
+
+input:
+  ksy_file              path to .ksy file
+  bin_file              path to binary file
+
+build flags:
+  -e, --empty-ommit     do NOT include empty fields in result
+
+output:
+  -o {dot,trawl}, --output {dot,trawl}
+                        serialize builded tree
+  -f FILE, --file FILE  output to file (defaults to stdout)
+
+example:
+    kspyspector tests/data/sample.ksy tests/data/sample.bin
 ```
 
 ### API usage
