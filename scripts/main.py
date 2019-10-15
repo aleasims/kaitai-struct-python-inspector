@@ -1,3 +1,8 @@
+"""
+    Example usage:
+kspyspector tests/data/sample.ksy tests/data/sample.bin
+"""
+
 import argparse
 import sys
 
@@ -18,10 +23,10 @@ def parse_args():
                               help='path to binary file')
 
     build_params = parser.add_argument_group('build flags')
-    build_params.add_argument('-e', '--empty-ommit', action='store_true',
+    build_params.add_argument('-e', '--empty_ommit', action='store_true',
                               help='do NOT include empty fields in result')
 
-    output_params = parser.add_argument_group('output')    
+    output_params = parser.add_argument_group('output')
     output_params.add_argument('-o', '--output', type=str,
                                choices=['dot', 'trawl'],
                                help='serialize builded tree')
@@ -33,7 +38,8 @@ def parse_args():
 def main():
     args = parse_args()
 
-    insp = Inspector(args.ksy_file, args.bin_file, args.verbose)
+    insp = Inspector(args.ksy_file, args.bin_file, args.empty_ommit,
+                     args.verbose)
 
     if args.output is not None:
         out_file = sys.stdout if args.file is None else open(args.file, 'w')

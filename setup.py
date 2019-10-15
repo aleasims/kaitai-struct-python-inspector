@@ -47,7 +47,6 @@ setup(
     version=kspyspector.__version__,
     description='Tree builder for Kaitai Struct parsed objects',
     long_description=long_description,
-    long_description_content_type='text/markdown',
     url='https://github.com/aleasims/kaitai-struct-python-inspector',
     author=kspyspector.__author__,
     classifiers=classifiers,

@@ -45,13 +45,14 @@ def find_parser_class(module, name):
 
 def compile(path, verbose=False):
     with create_tmp() as tmp:
-        cmd = 'ksc --outdir {output} --target python --debug {file}'.format(
+        cmd = 'ksc --debug --target python --outdir {output} {file}'.format(
             file=path, output=tmp)
         if verbose:
             print(cmd)
 
         proc = subprocess.Popen(cmd.split(),
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
         out, err = proc.communicate()
         if out or err:
             print('Something went wrong during compilation!')
