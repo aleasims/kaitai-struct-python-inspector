@@ -1,6 +1,7 @@
 import base64
 import functools
 import json
+import yaml
 from enum import Enum
 from queue import Queue
 
@@ -36,6 +37,7 @@ def with_tree_only(func):
 class Inspector:
     def __init__(self, ksy_path, bin_path, ommit_empty=False, verbose=False):
         self.ksy_path = ksy_path
+        self.ksy = yaml.safe_load(open(self.ksy_path))
         self.bin_path = bin_path
         self.verbose = verbose
         self.ommit_empty = ommit_empty
