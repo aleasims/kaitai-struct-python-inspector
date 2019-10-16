@@ -1,13 +1,10 @@
 import base64
-import functools
 import json
-import yaml
 from enum import Enum
 from queue import Queue
 
 from graphviz import Digraph
 
-from kspyspector import ksy
 from kspyspector import parsetree
 
 
@@ -19,35 +16,24 @@ class NodeType(Enum):
     VariantNode = 4  # VARIANT
 
 
-def with_tree_only(func):
-    """Checks persistence of `tree` attribute.
-
-    Only for methods.
-    """
-
-    @functools.wraps(func)
-    def wrapper(self, *args, **kwargs):
-        if not hasattr(self, 'tree'):
-            raise AttributeError('No tree builded.')
-        return func(self, *args, **kwargs)
-
-    return wrapper
-
-
 class Inspector:
-    def __init__(self, ksy_path, bin_path, ommit_empty=False, verbose=False):
-        self.ksy_path = ksy_path
-        self.ksy = yaml.safe_load(open(self.ksy_path))
-        self.bin_path = bin_path
-        self.verbose = verbose
-        self.ommit_empty = ommit_empty
-        self.ParserClass = ksy.compile(self.ksy_path, verbose=self.verbose)
-        self.tree = parsetree.parse_and_build(self.ParserClass,
-                                              self.bin_path,
-                                              self.ommit_empty,
-                                              self.verbose)
+    def __init__(self, ksy, bin_path, ommit_empty=False, verbose=False):
+        self.ksy = ksy
+        self.parser = self.ksy.compile()
+        self.spec = self.ksy.interpret()
 
-    @with_tree_only
+        self.bin_path = bin_path
+        self.ommit_empty = ommit_empty
+        self.verbose = verbose
+
+    def parse(self):
+        self.struct = self.parser.from_file(self.bin_path)
+        self.struct._read()
+
+    def build(self):
+        self.tree = parsetree.build(self.struct, self.ommit_empty,
+                                    self.verbose)
+
     def to_dot(self):
         dot = Digraph()
         targets = Queue()
@@ -62,7 +48,6 @@ class Inspector:
                 targets.put(child)
         return dot.source
 
-    @with_tree_only
     def to_trawl(self):
         def _to_trawl(node, **kwargs):
             """Recursive callable."""
@@ -75,7 +60,8 @@ class Inspector:
                         'position': i,
                         'length': child.size,
                         'offset': child.start,
-                        'type': getattr(NodeType, child.__class__.__name__).value
+                        'type': getattr(NodeType,
+                                        child.__class__.__name__).value
                     }
                     if isinstance(child, parsetree.ValueNode):
                         args['interpreted_value'] = str(child.value)
@@ -89,9 +75,9 @@ class Inspector:
                                                offset=0,
                                                length=self.tree.size,
                                                type=NodeType.RootNode.value),
-                            'meta': {
-                                'generic': False,
-                                'complete_buffer': True,
-                                'buffer': base64.b64encode(self.tree.buffer).decode()
-                            }
-                          })
+                           'meta': {
+            'generic': False,
+            'complete_buffer': True,
+            'buffer': base64.b64encode(self.tree.buffer).decode()
+        }
+        })
